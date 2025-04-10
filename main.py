@@ -128,7 +128,7 @@ async def sos_help(message: types.Message):
     await message.answer("🧠 Думаю над ответом...")
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+           model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "Ты доброжелательный психолог, помогающий бросить курить."},
                 {"role": "user", "content": "Мне хочется курить, что делать?"}
