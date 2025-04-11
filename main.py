@@ -133,7 +133,7 @@ async def sos_help(message: types.Message):
                 "Content-Type": "application/json"
             }
             payload = {
-                "model": "mistralai/mistral-7b-instruct",
+                "model": "openchat/openchat-3.5",  # ✅ бесплатная модель
                 "messages": [
                     {"role": "system", "content": "Ты доброжелательный психолог, помогающий бросить курить."},
                     {"role": "user", "content": "Мне хочется курить, что делать?"}
@@ -154,3 +154,4 @@ async def sos_help(message: types.Message):
 if __name__ == '__main__':
     logging.info("Бот запускается...")
     executor.start_polling(dp, skip_updates=True)
+
