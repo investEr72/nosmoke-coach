@@ -141,10 +141,16 @@ async def sos_help(message: types.Message):
             }
             async with session.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload) as resp:
                 data = await resp.json()
-                answer = data['choices'][0]['message']['content']
-                await message.answer(f"👏 Ответ:\n{answer}")
-    except Exception as e:
-        await message.answer(f"⚠️ Ошибка: {e}")
+
+if 'choices' in data and len(data['choices']) > 0:
+    answer = data['choices'][0]['message']['content']
+    await message.answer(f"👏 Ответ:\n{answer}")
+else:
+    # Если API вернул ошибку или пустой результат
+    await message.answer(f"⚠️ Ошибка OpenRouter:\n{data.get('error', 'Ответ пустой или не содержит поля choices')}")
+
+except Exception as e:
+    await message.answer(f"⚠️ Ошибка: {e}")
 if __name__ == '__main__':
     logging.info("Бот запускается...")
     executor.start_polling(dp, skip_updates=True)
