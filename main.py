@@ -133,7 +133,7 @@ async def sos_help(message: types.Message):
                 "Content-Type": "application/json"
             }
             payload = {
-                "model": "openchat/openchat-3.5",  # ✅ бесплатная модель
+                "model": "openchat/openchat-3.5-0106", 
                 "messages": [
                     {"role": "system", "content": "Ты доброжелательный психолог, помогающий бросить курить."},
                     {"role": "user", "content": "Мне хочется курить, что делать?"}
