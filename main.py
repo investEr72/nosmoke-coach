@@ -11,11 +11,10 @@ logging.basicConfig(level=logging.INFO)
 
 # --- Tokens ---
 API_TOKEN = os.getenv("API_TOKEN")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not API_TOKEN or not OPENAI_API_KEY:
-    raise ValueError("❌ Не указаны переменные окружения API_TOKEN или OPENAI_API_KEY")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-openai.api_key = OPENAI_API_KEY
+if not API_TOKEN or not OPENROUTER_API_KEY:
+    raise ValueError("❌ Не указаны переменные окружения API_TOKEN или OPENROUTER_API_KEY")
 
 # --- Bot ---
 bot = Bot(token=API_TOKEN)
@@ -123,29 +122,27 @@ async def start_day_one(message: types.Message):
         )
     )
 
+import aiohttp  # добавь в начало файла, если ещё не добавил
+
 @dp.message_handler(lambda m: m.text == "🚨 SOS")
 async def sos_help(message: types.Message):
     await message.answer("🧠 Думаю над ответом...")
     try:
-        response = openai.ChatCompletion.create(
-           model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Ты доброжелательный психолог, помогающий бросить курить."},
-                {"role": "user", "content": "Мне хочется курить, что делать?"}
-            ],
-            max_tokens=200,
-            temperature=0.7,
-            timeout=15  # safety timeout
-        )
-        answer = response['choices'][0]['message']['content']
-        await message.answer(f"👏 Ответ:\n{answer}")
+        async with aiohttp.ClientSession() as session:
+            headers = {
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": "mistralai/mistral-7b-instruct",
+                "messages": [
+                    {"role": "system", "content": "Ты доброжелательный психолог, помогающий бросить курить."},
+                    {"role": "user", "content": "Мне хочется курить, что делать?"}
+                ]
+            }
+            async with session.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload) as resp:
+                data = await resp.json()
+                answer = data['choices'][0]['message']['content']
+                await message.answer(f"👏 Ответ:\n{answer}")
     except Exception as e:
         await message.answer(f"⚠️ Ошибка: {e}")
-
-# --- Run ---
-if __name__ == '__main__':
-    try:
-        logging.info("Бот запускается...")
-        executor.start_polling(dp, skip_updates=True)
-    except Exception as e:
-        logging.error(f"Ошибка запуска: {e}")
