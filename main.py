@@ -220,8 +220,9 @@ async def start_day_one(message: types.Message):
                 KeyboardButton("🚨 SOS"),
                 KeyboardButton("👥 Запись к психологу")
             )
+        )  # ← Закрывающая скобка была добавлена
     except Exception as e:
-        logger.error(f"Ошибка в start_day_one: {e}")
+        logger.error(f"Ошибка в start_day_one: {e}")  # ← Исправлено логирование
 
 @dp.message_handler(lambda m: m.text == "🚨 SOS")
 async def sos_help(message: types.Message):
